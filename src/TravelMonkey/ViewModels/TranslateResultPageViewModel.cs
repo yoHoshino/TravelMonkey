@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TravelMonkey.Services;
 using Xamarin.Forms;
+using Xamarin.Essentials;
 
 namespace TravelMonkey.ViewModels
 {
@@ -38,6 +40,16 @@ namespace TravelMonkey.ViewModels
         public Command<string> TranslateTextCommand => new Command<string>((inputText) =>
         {
             InputText = inputText;
+        });
+
+        public Command<string> SpeechTextCommand => new Command<string>(async key =>
+        {
+            var locales = await TextToSpeech.GetLocalesAsync();
+            var local = locales.FirstOrDefault(l => l.Language == key);
+
+            var value = _translations[key];
+
+            await TextToSpeech.SpeakAsync(value, new SpeechOptions {Locale = local});
         });
 
         private async void TranslateText()
